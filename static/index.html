@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RescueBot – AI-Powered Disaster Response</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10h-6v-6H9v6H3z"/></symbol>
+<symbol id="chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+<symbol id="map" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14"/></symbol>
+<symbol id="route" viewBox="0 0 24 24"><path d="M6 19h8a4 4 0 000-8h-4a4 4 0 010-8h6"/></symbol>
+<symbol id="play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></symbol>
+<symbol id="drop" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/></symbol>
+<symbol id="shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></symbol>
+<symbol id="set" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M16 5v4M8 15v4"/></symbol>
+<symbol id="send" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></symbol>
+<symbol id="moon" viewBox="0 0 24 24"><path d="M20 14A8 8 0 1110 4a6 6 0 0010 10z"/></symbol>
+<symbol id="pin" viewBox="0 0 24 24"><path d="M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11zM12 12a2 2 0 100-4"/></symbol>
+<symbol id="bot" viewBox="0 0 24 24"><path d="M5 8h14v10H5zM12 4v4M9 13h.01M15 13h.01"/></symbol>
+</defs></svg>
+<div class="app">
+<nav aria-label="Main">
+ <div class="logo"><svg class="i"><use href="#shield"/></svg></div>
+ <button class="on" data-go="dash"><svg class="i"><use href="#home"/></svg>Home</button>
+ <button data-go="chat"><svg class="i"><use href="#chat"/></svg>Chat</button>
+ <button data-go="mapw"><svg class="i"><use href="#map"/></svg>Map</button>
+ <button data-go="plan"><svg class="i"><use href="#route"/></svg>Rescue plan</button>
+ <button data-go="simc"><svg class="i"><use href="#play"/></svg>Simulation</button>
+ <button data-go="risk"><svg class="i"><use href="#drop"/></svg>Flood risk</button>
+ <button data-go="safe"><svg class="i"><use href="#shield"/></svg>Safe zone</button>
+ <button data-go="set"><svg class="i"><use href="#set"/></svg>Settings</button>
+</nav>
+<main>
+<header>
+ <div><h1>RescueBot</h1><small>AI-Powered Disaster Response</small></div><div class="sp"></div>
+ <label class="sel"><svg class="i"><use href="#pin"/></svg><span id="loc">Loading…</span></label>
+ <label class="sel">Flood view <select id="view" aria-label="Flood view"><option value="live">Live</option><option value="0">Hour 0</option><option value="2">Hour 2</option><option value="5">Hour 5</option><option value="10">Hour 10</option></select></label>
+ <label class="sel">Speed <select id="spd" aria-label="Speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></label>
+ <button class="btn demo" id="demo" title="Reset and auto-play the full mission">▶ Live demo</button><button class="btn g" id="rep" title="Download report with charts (HTML/PDF)">Report</button><button class="btn g" id="wrd" title="Download Word (.docx) report">Word</button>
+ <button class="ib" id="theme" title="Dark mode (D)" aria-label="Toggle dark mode"><svg class="i"><use href="#moon"/></svg></button>
+</header>
+<div class="kpis" id="kpis"></div>
+<div class="grid" id="dash">
+ <section class="card" id="chat" aria-label="Assistant">
+  <div class="ch"><div class="av"><svg class="i"><use href="#bot"/></svg></div><div><b>RescueBot AI Assistant</b><small id="ast">Connecting…</small></div></div>
+  <div id="log" aria-live="polite"></div>
+  <div class="chips" id="chips"></div>
+  <form id="f"><input id="q" placeholder="Ask RescueBot anything…" autocomplete="off" aria-label="Message"><button class="btn" aria-label="Send"><svg class="i"><use href="#send"/></svg></button></form>
+ </section>
+ <section class="card mapw" id="mapw" aria-label="Map">
+  <div id="lmap" style="position:absolute;inset:0"></div>
+  <div class="ov banner" id="banner" hidden></div>
+  <div class="ov styles"><label><input type="radio" name="t" value="sat" checked>Satellite</label><label><input type="radio" name="t" value="str">Street</label><label><input type="radio" name="t" value="ter">Terrain</label></div>
+  <div class="ov legend"><b style="grid-column:1/3">Legend</b>
+   <span><i style="background:#2563eb"></i>Flooded (blocked)</span><span><i style="background:#e5484d"></i>High risk</span>
+   <span><i style="background:#f5a524"></i>Medium risk</span><span><i style="background:#16a34a"></i>Safe route</span>
+   <span><i style="background:#e5484d;border-radius:50%"></i>Critical person</span><span><i style="background:#f5a524;border-radius:50%"></i>Person to rescue</span>
+   <span><i style="background:#0f2747"></i>Robot</span><span><i style="background:#94a3b8"></i>Building</span>
+  </div>
+ </section>
+ <div class="side">
+  <section class="card" id="risk"><h3><svg class="i"><use href="#drop"/></svg>Flood risk analysis</h3><div id="riskb"></div></section>
+  <section class="card" id="plan"><h3><svg class="i"><use href="#route"/></svg>Rescue plan</h3><div id="planb"></div></section>
+  <section class="card" id="simc"><h3><svg class="i"><use href="#play"/></svg>Simulation results</h3><div id="simb"></div></section>
+ </div>
+</div>
+</main>
+</div>
+<dialog id="dlg"><div id="dlgb"></div><div class="ctl"><button class="btn g" onclick="dlg.close()">Close</button></div></dialog>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
